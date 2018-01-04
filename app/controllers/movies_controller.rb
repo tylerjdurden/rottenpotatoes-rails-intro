@@ -11,15 +11,32 @@ class MoviesController < ApplicationController
 	end
 
 	def index
-		@movies = Movie.all
+		@all_ratings = Movie.unique_ratings
 		if (params[:clicked] == 'title')
 			@movies = Movie.order(:title)
 			@hl_title = 'hilite'
-		end
-		if (params[:clicked] == 'release')
+		elsif (params[:clicked] == 'release')
 			@movies = Movie.order(:release_date)
 			@hl_release = 'hilite'
+		else
+			@movies = Movie.all
 		end
+		# puts 'checked is', @checked
+		# puts 'all_ratings is', @all_ratings
+		# puts 'params ratings is"', params[:ratings]
+		# @checked = ((defined? params[:ratings]) != nil) ? params[:ratings] : @all_ratings
+		if params[:ratings]
+			@checked = params[:ratings]
+			@movies = @movies.select { |movie| @checked.include? movie.rating }
+		elsif session[:ratings]
+			@checked = session[:ratings]
+			@movies = @movies.select { |movie| @checked.include? movie.rating }
+		else
+			# Check all boxes by default
+			@checked = Hash[@all_ratings.zip([1,1,1,1])]
+		end
+		session[:ratings] = @checked
+		puts 'Selected ratings were: ', session[:ratings]
 	end
 
 	def new
