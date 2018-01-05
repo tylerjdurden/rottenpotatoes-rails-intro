@@ -11,32 +11,35 @@ class MoviesController < ApplicationController
 	end
 
 	def index
+		# session.clear
 		@all_ratings = Movie.unique_ratings
-		if (params[:clicked] == 'title')
-			@movies = Movie.order(:title)
-			@hl_title = 'hilite'
-		elsif (params[:clicked] == 'release')
-			@movies = Movie.order(:release_date)
-			@hl_release = 'hilite'
-		else
-			@movies = Movie.all
-		end
-		# puts 'checked is', @checked
-		# puts 'all_ratings is', @all_ratings
-		# puts 'params ratings is"', params[:ratings]
-		# @checked = ((defined? params[:ratings]) != nil) ? params[:ratings] : @all_ratings
+
 		if params[:ratings]
 			@checked = params[:ratings]
-			@movies = @movies.select { |movie| @checked.include? movie.rating }
 		elsif session[:ratings]
 			@checked = session[:ratings]
-			@movies = @movies.select { |movie| @checked.include? movie.rating }
 		else
 			# Check all boxes by default
 			@checked = Hash[@all_ratings.zip([1,1,1,1])]
 		end
 		session[:ratings] = @checked
-		puts 'Selected ratings were: ', session[:ratings]
+
+		# Check URI for sorting params. If not available, take from session
+		if (params[:clicked] == 'title')
+			@movies = Movie.order(:title).where(rating: @checked.keys)
+			@hl_title = 'hilite'
+			session[:clicked] = 'title'
+		elsif (params[:clicked] == 'release')
+			@movies = Movie.order(:release_date).where(rating: @checked.keys)
+			@hl_release = 'hilite'
+			session[:clicked] = 'release'
+		elsif (session[:clicked] == 'title') or (session[:clicked] == 'release')
+			@movies = Movie.order(:title)
+			@hl_title = 'hilite'
+			redirect_to movies_path(clicked: session[:clicked], ratings: @checked)
+		else
+			@movies = Movie.all
+		end
 	end
 
 	def new

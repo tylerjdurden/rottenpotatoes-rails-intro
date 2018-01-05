@@ -1,7 +1,7 @@
 -#  This file is app/views/movies/index.html.haml
 %h1 All Movies
 
-= form_tag movies_path, id: 'ratings_form', :method => :get do
+= form_tag movies_path(:form => 'submitted'), id: 'ratings_form', :method => :get do
   Include:
   - @all_ratings.each do |rating|
     = rating
@@ -14,11 +14,11 @@
     %tr
       %th{class: @hl_title}
         -# %a#title_header Movie Title
-        = link_to 'Movie Title', movies_path(:clicked => 'title'), id: 'title_header'
+        = link_to 'Movie Title', movies_path(:clicked => 'title', :ratings => @checked), id: 'title_header'
       %th Rating
       %th{class: @hl_release}
         -# %a#release_date_header Release Date
-        = link_to 'Release Date', movies_path(:clicked => 'release'), id: 'release_date_header'
+        = link_to 'Release Date', movies_path(:clicked => 'release', :ratings => @checked), id: 'release_date_header'
       %th More Info
   %tbody
     - @movies.each do |movie|
