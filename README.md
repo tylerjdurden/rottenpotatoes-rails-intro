@@ -1,3 +1,5 @@
+### Heroku link: http://tyler-rails-example.herokuapp.com
+
 # RottenPotatoes demo app: getting started
 
 This app is associated with the free [online
